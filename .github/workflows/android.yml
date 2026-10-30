@@ -1,0 +1,40 @@
+name: Build Afghan Business Pro APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get Project
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Create Android Folder
+        run: |
+          if [ ! -d android ]; then
+            flutter create --platforms=android --org com.afghanbusinesspro .
+          fi
+
+      - name: Install Packages
+        run: flutter pub get
+
+      - name: Check Project
+        run: flutter analyze --no-fatal-infos
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Afghan-Business-Pro-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
